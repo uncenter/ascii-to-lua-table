@@ -6,7 +6,13 @@ import luaLang from "shiki/langs/lua.mjs";
 
 const isDark = useDark();
 
-const input = useStorage("input", "");
+const input = useStorage(
+  "input",
+  `  ／l、
+（ﾟ､ ｡ ７
+  l  ~ヽ
+  じしf_,)ノ`,
+);
 const output = ref("");
 
 const copied = ref(false);
