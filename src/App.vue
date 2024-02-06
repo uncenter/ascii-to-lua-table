@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import type { HighlighterCore } from "shiki/core";
+import { getHighlighterCore } from "shiki/core";
+import githubLightTheme from "shiki/themes/github-light.mjs";
+import luaLang from "shiki/langs/lua.mjs";
+
 const isDark = useDark();
 
 const input = useStorage("input", "");
@@ -21,29 +26,31 @@ function asciiToLuaTable(ascii) {
       result += ", \n  ";
     }
 
-    const diff = longestLine.length - line.length;
+    const padding = " ".repeat(longestLine.length - line.length);
+    const wrapper = ["[[", "]]"];
 
-    let toPush;
-
-    const newline = line.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-
-    if (line.length < longestLine.length) {
-      const padding = " ".repeat(diff);
-      toPush = `"${newline}${padding}"`;
-    } else {
-      toPush = `"${newline}"`;
-    }
-
-    result += toPush;
+    result += `${wrapper[0]}${line.length < longestLine.length ? line + padding : line}${wrapper[1]}`;
   }
 
-  return `{
+  return ascii.length > 0
+    ? `local table = {
   ${result}
-}`;
+}`
+    : "";
 }
 
 async function run() {
-  output.value = asciiToLuaTable(input.value);
+  const highlighter = await getHighlighterCore({
+    themes: [githubLightTheme],
+    langs: [luaLang],
+    loadWasm: () => import("shiki/wasm"),
+  });
+
+  const result = highlighter.codeToHtml(asciiToLuaTable(input.value), {
+    lang: "lua",
+    theme: "github-light",
+  });
+  output.value = result;
 }
 
 function clear() {
@@ -117,9 +124,9 @@ if (import.meta.hot) {
         py1
         class="w-full md:w-[50vw] h-[40vh] md:h-[70vh]"
       />
-      <textarea
+      <div
         border="~ base rounded"
-        v-model="output"
+        v-html="output"
         px3
         py1
         class="w-full md:w-[50vw] h-[40vh] md:h-[70vh]"
