@@ -57,7 +57,6 @@ async function run() {
     lang: "lua",
     theme: isDark.value ? "github-dark" : "github-light",
   });
-  console.log({ isDark });
   output.value = result;
 }
 
@@ -134,6 +133,9 @@ if (import.meta.hot) {
           (isDark ? 'bg-[#24292F] ' : '') +
           'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
         "
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
       />
       <div
         border="~ base rounded"
