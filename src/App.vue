@@ -2,6 +2,7 @@
 import type { HighlighterCore } from "shiki/core";
 import { getHighlighterCore } from "shiki/core";
 import githubLightTheme from "shiki/themes/github-light.mjs";
+import githubDarkTheme from "shiki/themes/github-dark.mjs";
 import luaLang from "shiki/langs/lua.mjs";
 
 const isDark = useDark();
@@ -47,15 +48,16 @@ function asciiToLuaTable(ascii) {
 
 async function run() {
   const highlighter = await getHighlighterCore({
-    themes: [githubLightTheme],
+    themes: [githubLightTheme, githubDarkTheme],
     langs: [luaLang],
     loadWasm: () => import("shiki/wasm"),
   });
 
   const result = highlighter.codeToHtml(asciiToLuaTable(input.value), {
     lang: "lua",
-    theme: "github-light",
+    theme: isDark.value ? "github-dark" : "github-light",
   });
+  console.log({ isDark });
   output.value = result;
 }
 
@@ -72,7 +74,7 @@ function copy() {
 }
 
 watch(
-  input,
+  [input, isDark],
   (n, o) => {
     const changed = o !== n;
     if (changed) run();
@@ -128,14 +130,20 @@ if (import.meta.hot) {
         placeholder="ASCII..."
         px3
         py1
-        class="w-full md:w-[50vw] h-[40vh] md:h-[70vh]"
+        :class="
+          (isDark ? 'bg-[#24292F] ' : '') +
+          'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
+        "
       />
       <div
         border="~ base rounded"
         v-html="output"
         px3
         py1
-        class="w-full md:w-[50vw] h-[40vh] md:h-[70vh]"
+        :class="
+          (isDark ? 'bg-[#24292F] ' : '') +
+          'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
+        "
       />
     </div>
   </div>
