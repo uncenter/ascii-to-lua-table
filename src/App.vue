@@ -20,13 +20,18 @@ const copied = ref(false);
 const clipboard = useClipboard();
 
 function asciiToLuaTable(ascii) {
+  function escape(str) {
+    return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  }
+
   let result = "";
   let first = true;
 
-  const lines = ascii.split("\n");
+  const lines = ascii.split("\n").map((line) => escape(line));
   const longestLine = lines.reduce((a, b) => (a.length > b.length ? a : b));
+  console.log(longestLine);
 
-  for (const line of lines) {
+  for (let line of lines) {
     if (first) {
       first = false;
     } else {
@@ -34,7 +39,7 @@ function asciiToLuaTable(ascii) {
     }
 
     const padding = " ".repeat(longestLine.length - line.length);
-    const wrapper = ["[[", "]]"];
+    const wrapper = ['"', '"'];
 
     result += `${wrapper[0]}${line.length < longestLine.length ? line + padding : line}${wrapper[1]}`;
   }
