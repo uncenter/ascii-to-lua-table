@@ -147,6 +147,7 @@ if (import.meta.hot) {
         v-html="output"
         px3
         py1
+        of-auto
         :class="
           (isDark ? 'bg-[#24292F] ' : '') +
           'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
