@@ -41,7 +41,7 @@ function asciiToLuaTable(ascii) {
     const padding = " ".repeat(longestLine.length - line.length);
     const wrapper = ['"', '"'];
 
-    result += `${wrapper[0]}${line.length < longestLine.length ? line + padding : line}${wrapper[1]}`;
+    result += `${wrapper[0]}${line.length > 0 && line.length < longestLine.length ? line + padding : line}${wrapper[1]}`;
   }
 
   return ascii.length > 0
