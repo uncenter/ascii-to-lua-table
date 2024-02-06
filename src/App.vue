@@ -108,21 +108,21 @@ if (import.meta.hot) {
         </button>
       </div>
     </header>
-    <div flex="~ row gap-4" p4>
+    <div flex="~ col md:row gap-4" font-mono p4>
       <textarea
         border="~ base rounded"
         v-model="input"
         placeholder="ASCII..."
         px3
         py1
-        class="w-[50vw] h-[70vh]"
+        class="w-full md:w-[50vw] h-[40vh] md:h-[70vh]"
       />
       <textarea
         border="~ base rounded"
         v-model="output"
         px3
         py1
-        class="w-[50vw] h-[70vh]"
+        class="w-full md:w-[50vw] h-[40vh] md:h-[70vh]"
       />
     </div>
   </div>
