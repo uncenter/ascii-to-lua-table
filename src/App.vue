@@ -14,6 +14,7 @@ const input = useStorage(
   l  ~ヽ
   じしf_,)ノ`,
 );
+const converted = ref("");
 const output = ref("");
 
 const copied = ref(false);
@@ -29,7 +30,6 @@ function asciiToLuaTable(ascii) {
 
   const lines = ascii.split("\n").map((line) => escape(line));
   const longestLine = lines.reduce((a, b) => (a.length > b.length ? a : b));
-  console.log(longestLine);
 
   for (let line of lines) {
     if (first) {
@@ -52,17 +52,17 @@ function asciiToLuaTable(ascii) {
 }
 
 async function run() {
+  converted.value = asciiToLuaTable(input.value);
   const highlighter = await getHighlighterCore({
     themes: [githubLightTheme, githubDarkTheme],
     langs: [luaLang],
     loadWasm: () => import("shiki/wasm"),
   });
 
-  const result = highlighter.codeToHtml(asciiToLuaTable(input.value), {
+  output.value = highlighter.codeToHtml(converted.value, {
     lang: "lua",
     theme: isDark.value ? "github-dark" : "github-light",
   });
-  output.value = result;
 }
 
 function clear() {
@@ -70,7 +70,8 @@ function clear() {
 }
 
 function copy() {
-  clipboard.copy(output.value);
+  if (converted.value.length === 0) return;
+  clipboard.copy(converted.value);
   copied.value = true;
   setTimeout(() => {
     copied.value = false;
@@ -112,15 +113,6 @@ if (import.meta.hot) {
           border="~ base rounded"
           p2
           hover="bg-active"
-          title="Clear"
-          @click="clear()"
-        >
-          <div i-carbon-clean />
-        </button>
-        <button
-          border="~ base rounded"
-          p2
-          hover="bg-active"
           @click="isDark = !isDark"
         >
           <div dark:i-carbon-moon i-carbon-sun />
@@ -144,15 +136,35 @@ if (import.meta.hot) {
       />
       <div
         border="~ base rounded"
-        v-html="output"
         px3
         py1
+        relative
         of-auto
         :class="
           (isDark ? 'bg-[#24292F] ' : '') +
           'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
         "
-      />
+      >
+        <button
+          border="~ base rounded"
+          p2
+          absolute
+          top-2
+          right-2
+          :class="
+            converted.length > 0
+              ? 'hover:bg-active'
+              : 'op-[0.5] cursor-not-allowed'
+          "
+          :aria-disabled="converted.length === 0"
+          title="Copy"
+          @click="copy()"
+        >
+          <div v-if="copied" i-carbon-checkmark />
+          <div v-else i-carbon-copy />
+        </button>
+        <div v-html="output" />
+      </div>
     </div>
   </div>
 </template>
