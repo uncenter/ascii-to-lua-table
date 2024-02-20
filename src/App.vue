@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import type { HighlighterCore } from "shiki/core";
-import { getHighlighterCore } from "shiki/core";
-import githubLightTheme from "shiki/themes/github-light.mjs";
-import githubDarkTheme from "shiki/themes/github-dark.mjs";
-import luaLang from "shiki/langs/lua.mjs";
+import type { HighlighterCore } from 'shiki/core';
+import { getHighlighterCore } from 'shiki/core';
+import githubLightTheme from 'shiki/themes/github-light.mjs';
+import githubDarkTheme from 'shiki/themes/github-dark.mjs';
+import luaLang from 'shiki/langs/lua.mjs';
 
 const isDark = useDark();
 
 const input = useStorage(
-	"input",
+	'input',
 	`  ／l、
 （ﾟ､ ｡ ７
   l  ~ヽ
   じしf_,)ノ`,
 );
-const converted = ref("");
-const output = ref("");
+const converted = ref('');
+const output = ref('');
 
 const copied = ref(false);
 const clipboard = useClipboard();
 
 function asciiToLuaTable(ascii) {
 	function escape(str) {
-		return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+		return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 	}
 
-	let result = "";
+	let result = '';
 	let first = true;
 
-	const lines = ascii.split("\n").map((line) => escape(line));
+	const lines = ascii.split('\n').map((line) => escape(line));
 	const longestLine = lines.reduce((a, b) => (a.length > b.length ? a : b));
 
 	for (let line of lines) {
 		if (first) {
 			first = false;
 		} else {
-			result += ", \n  ";
+			result += ', \n  ';
 		}
 
-		const padding = " ".repeat(longestLine.length - line.length);
+		const padding = ' '.repeat(longestLine.length - line.length);
 		const wrapper = ['"', '"'];
 
 		result += `${wrapper[0]}${line.length > 0 && line.length < longestLine.length ? line + padding : line}${wrapper[1]}`;
@@ -48,7 +48,7 @@ function asciiToLuaTable(ascii) {
 		? `local table = {
   ${result}
 }`
-		: "";
+		: '';
 }
 
 async function run() {
@@ -56,17 +56,17 @@ async function run() {
 	const highlighter = await getHighlighterCore({
 		themes: [githubLightTheme, githubDarkTheme],
 		langs: [luaLang],
-		loadWasm: () => import("shiki/wasm"),
+		loadWasm: () => import('shiki/wasm'),
 	});
 
 	output.value = highlighter.codeToHtml(converted.value, {
-		lang: "lua",
-		theme: isDark.value ? "github-dark" : "github-light",
+		lang: 'lua',
+		theme: isDark.value ? 'github-dark' : 'github-light',
 	});
 }
 
 function clear() {
-	input.value = "";
+	input.value = '';
 }
 
 function copy() {
@@ -100,27 +100,68 @@ if (import.meta.hot) {
 			<h1>ASCII to Lua Table Converter</h1>
 
 			<div flex="~ row gap-2">
-				<a border="~ base rounded" p2 hover="bg-active" aria-label="GitHub repository"
-					href="https://github.com/uncenter/ascii-to-lua-table" target="_blank">
+				<a
+					border="~ base rounded"
+					p2
+					hover="bg-active"
+					aria-label="GitHub repository"
+					href="https://github.com/uncenter/ascii-to-lua-table"
+					target="_blank"
+				>
 					<div i-carbon-logo-github />
 				</a>
-				<button border="~ base rounded" p2 hover="bg-active"
-					:aria-label="'Toggle theme to ' + (isDark ? 'light' : 'dark')" @click="isDark = !isDark">
+				<button
+					border="~ base rounded"
+					p2
+					hover="bg-active"
+					:aria-label="'Toggle theme to ' + (isDark ? 'light' : 'dark')"
+					@click="isDark = !isDark"
+				>
 					<div dark:i-carbon-moon i-carbon-sun />
 				</button>
 			</div>
 		</header>
 		<div flex="~ col md:row gap-4" font-mono p4>
-			<textarea border="~ base rounded" v-model="input" placeholder="ASCII..." px3 py1 :class="(isDark ? 'bg-[#24292F] ' : '') +
-				'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
-				" spellcheck="false" autocorrect="off" autocapitalize="off" />
-			<div border="~ base rounded" px3 py1 relative of-auto :class="(isDark ? 'bg-[#24292F] ' : '') +
-				'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
-				">
-				<button border="~ base rounded" p2 absolute top-2 right-2 :class="converted.length > 0
-						? 'hover:bg-active'
-						: 'op-[0.5] cursor-not-allowed'
-					" :aria-disabled="converted.length === 0" title="Copy" @click="copy()">
+			<textarea
+				border="~ base rounded"
+				v-model="input"
+				placeholder="ASCII..."
+				px3
+				py1
+				:class="
+					(isDark ? 'bg-[#24292F] ' : '') +
+					'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
+				"
+				spellcheck="false"
+				autocorrect="off"
+				autocapitalize="off"
+			/>
+			<div
+				border="~ base rounded"
+				px3
+				py1
+				relative
+				of-auto
+				:class="
+					(isDark ? 'bg-[#24292F] ' : '') +
+					'w-full md:w-[50vw] h-[40vh] md:h-[70vh]'
+				"
+			>
+				<button
+					border="~ base rounded"
+					p2
+					absolute
+					top-2
+					right-2
+					:class="
+						converted.length > 0
+							? 'hover:bg-active'
+							: 'op-[0.5] cursor-not-allowed'
+					"
+					:aria-disabled="converted.length === 0"
+					title="Copy"
+					@click="copy()"
+				>
 					<div v-if="copied" i-carbon-checkmark />
 					<div v-else i-carbon-copy />
 				</button>
